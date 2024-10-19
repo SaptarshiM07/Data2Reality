@@ -1,0 +1,27 @@
+.proposal-card {
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+  
+  .proposal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .resume-icon {
+    color: #007bff;
+  }
+  
+  .proposal-card-body {
+    padding: 10px;
+  }
+  
+  .proposal-action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }

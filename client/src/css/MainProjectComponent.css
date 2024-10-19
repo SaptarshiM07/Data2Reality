@@ -1,0 +1,87 @@
+.container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.left-pane {
+  flex: 0 0 64%; /* Takes 64% of the width */
+  height: 100vh; /* Full height */
+  padding: 2%; /* Responsive padding */
+  margin-left: 2%; /* Left margin for spacing */
+  margin-right: 2%;
+  background-color: #ffffff; /* Orange color */
+  box-sizing: border-box;
+  overflow-y: auto; /* Allow scrolling */
+  padding: 0;
+}
+
+.right-pane {
+  flex: 0 0 30%; /* Takes 30% of the width */
+  height: 100vh; /* Full height */
+  padding: 2%; /* Responsive padding */
+  margin-right: 2%; /* Right margin for spacing */
+  background-color: #d6d3c4; /* Blue color */
+  box-sizing: border-box;
+  overflow-y: auto; /* Enable vertical scrolling */
+  
+}
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin: 10%; /* Ensure no margin */
+  padding: 0; /* Ensure no padding */
+  width: 100%;
+}
+
+.proposal-list-container {
+  margin-top: 20px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 200px;
+  border: 1px solid red; /* Debug border */
+}
+
+/* Header Area styling */
+.header-area {
+  width: 100%; /* Full width */
+  height: 10%; /* Height as a proportion of viewport height */
+  background-color: #add8e6; /* Light blue header */
+  text-align: center;
+  line-height: 100px; /* Adjust based on your needs */
+  font-size: 2vw; /* Responsive font size */
+  margin: 0 auto; /* Center the header */
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column; /* Stack the panes vertically */
+  }
+  .left-pane,
+  .right-pane {
+    flex: 0 0 100%; /* Full width for both panes */
+    margin-left: 0; /* Remove left margin */
+    margin-right: 0; /* Remove right margin */
+  }
+}
+
+@media (max-width: 768px) {
+  .left-pane,
+  .right-pane {
+    padding: 5%; /* Adjust padding for smaller devices */
+  }
+}
+
+@media (max-width: 480px) {
+  .header-area {
+    font-size: 4vw; /* Further adjust font size for small screens */
+    line-height: 60px; /* Adjust line height */
+  }
+}

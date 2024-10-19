@@ -1,0 +1,52 @@
+/* styles.css */
+
+.container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .left-pane {
+    width: 50%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 50px 50px 50px;
+    box-sizing: border-box;
+  }
+  
+  .right-pane {
+    width: 50%;
+    height: 100vh;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  
+  .form-box {
+    width: 100%;
+  }
+
+
+  .dropzone {
+    flex: 1;
+    border: 2px dotted #007bff; /* Dotted border with a color */
+    border-radius: 8px; /* Optional: for rounded corners */
+    padding: 20px;
+    text-align: center;
+    background-color: #f8f9fa; /* Optional: background color */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .dropzone.active {
+    background-color: #e2e6ea; /* Optional: change background color when dragging */
+  }
+
+
+  .video-player-container {
+    flex: 1; /* Takes up available space */
+    display: flex;
+    justify-content: center; /* Center the player horizontally */
+    align-items: center; /* Center the player vertically */
+  }
