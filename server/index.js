@@ -4,8 +4,8 @@ import cors from 'cors';
 import routes from './routes/routes.js';
 import { initializeAWS } from './awsConfig.js';
 //import { listTables } from './scripts/checkifTableExists.js'; --> check if the the table can be accessed.
-import { updateTables } from './scripts/updateTables.js';
-import { createTables } from './scripts/createTables.js';
+//import { updateTables } from './scripts/updateTables.js';
+//import { createTables } from './scripts/createTables.js';
 
 dotenv.config();
 initializeAWS();
