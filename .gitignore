@@ -33,3 +33,6 @@ client/public/
 # ignore specific files in server directory
 server/scripts/
 
+#ignore the key
+/Data2RealitySSH.pem
+
