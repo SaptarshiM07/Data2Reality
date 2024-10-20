@@ -28,7 +28,7 @@
 # ignore specific files in client directory
 client/README.md
 client/src/components/test/
-client/public/
+
 
 # ignore specific files in server directory
 server/scripts/
