@@ -16,7 +16,10 @@ import { uploadUpdate } from '../controllers/uploadUpdate.js';
 import { displayProjects } from '../controllers/displayProjects.js';
 import { displayProposals } from '../controllers/displayProposals.js';
 import { setupRoute } from '../middlewares/utils/setupRoute.js';
-import { updateApplicationStatus } from '../controllers/updateApplicationStatus.js'
+import { updateApplicationStatus } from '../controllers/updateApplicationStatus.js';
+import { sendEmailVerification } from '../controllers/sendEmailVerification.js';
+import { checkEmailVerification } from '../controllers/checkEmailVerification.js';
+import { getUserStats } from '../controllers/getUserStats.js';
 
 
 
@@ -37,7 +40,13 @@ router.get('/user/data', authenticateToken, (req, res) => {
   console.log('GET /api/user/data')
   const user = req.user;
   res.json(user);
-  //console.log(res)
+  //console.log(res);
+})
+
+router.get('/stats', authenticateToken, (req, res) => {
+  console.log('GET /api/stats');
+  getUserStats(req,res);
+  //console.log(res);
 })
 
 //update userprofile handler 
@@ -113,5 +122,14 @@ router.post('/applicationStatus', authenticateToken, (req, res) => {
   updateApplicationStatus(req,res);
 })
 
+router.post('/sendEmailVerification', (req, res) => {
+  console.log('POST /api/sendEmailVerification')
+  sendEmailVerification(req,res);
+})
+
+router.post('/checkEmailVerification', (req,res) => {
+  console.log('POST /api/checkEmailVerification')
+  checkEmailVerification(req, res);
+})
 
 export default router;

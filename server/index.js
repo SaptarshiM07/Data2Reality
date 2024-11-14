@@ -7,6 +7,8 @@ import { initializeAWS } from './awsConfig.js';
 //import { updateTables } from './scripts/updateTables.js';
 //import { createTables } from './scripts/createTables.js';
 
+//import enableTTL from './scripts/enableTTL.js';
+
 dotenv.config();
 initializeAWS();
 
@@ -50,6 +52,10 @@ startServer(PORT);
 
 //create tables
 //createTables();
+
+//enableTTL();
+
+
 
 
 //update table schema

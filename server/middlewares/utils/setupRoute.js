@@ -36,7 +36,8 @@ export const setupRoute = (router, path, handler) => {
             await uploadResume(req, res).catch(handleError);
             // await uploadSupplementalFile(req, res).catch(handleError);
           } else if (userType === 'Employer') {
-            await uploadVideo(req, res).catch(handleError);
+            //await uploadVideo(req, res).catch(handleError);
+            await uploadSupplementalFile(req,res).catch(handleError);
             // console.log('Here is proposal Video file:', req.proposalvideoFile);
           }
   
@@ -70,7 +71,8 @@ export const setupRoute = (router, path, handler) => {
             await resumeUploads3(req, res).catch(handleError);
             // await supplementalUploads3(req, res).catch(handleError);
           } else if (userType === 'Employer') {
-            await proposalvideoUploads3(req, res).catch(handleError);
+            //await proposalvideoUploads3(req, res).catch(handleError);
+            await supplementalUploads3(req,res).catch(handleError);
           }
   
           if (!errorOccurred) {

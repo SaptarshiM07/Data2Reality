@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Button, Card, CardContent, IconButton, Typography, Dialog,
   DialogActions, DialogContent, DialogContentText, DialogTitle,
-  FormControlLabel, Checkbox
+  FormControlLabel, Checkbox, Box
 } from '@mui/material';
 import { Note as NoteIcon } from '@mui/icons-material';
 import { sns, snsTopicArn } from '../../awsConfig';
@@ -13,15 +13,12 @@ import "../../css/ProposalCard.css";
 const endpointpath = process.env.REACT_APP_API_BASE_URL;
 
 
-const ProposalCard = ({ proposal, proposals, fetchProposals }) => {
+const ProposalCard = ({ proposal, proposals, fetchProposals, isExpanded, onToggleExpand }) => {
   const [expanded, setExpanded] = useState(false);
   const [openDialog, setDialog] = useState(false);
   const [actionType, setActionType] = useState(null);  // To track Accept/Reject action
   const [acceptAndRejectOthers, setAcceptAndRejectOthers] = useState(false);  // For "Accept & Reject Others" checkbox
 
-  const toggleExpand = () => {
-    setExpanded(!expanded);
-  };
 
   const handleAccept = () => {
     setActionType('accept');
@@ -167,53 +164,51 @@ const ProposalCard = ({ proposal, proposals, fetchProposals }) => {
   };
 
   return (
-    <>
-      <Card className="proposal-card">
-        <CardContent onClick={toggleExpand} className="proposal-card-header">
-          <Typography variant="h6">{proposal.proposalSummary}</Typography>
 
-          {/* Icon for resume link */}
+      <>
+      <Card className="proposal-card" onClick={onToggleExpand}>
+        <CardContent className="proposal-card-header">
+          
+          <Box display="flex" flexDirection="column" marginTop={1}>
+              <Typography variant="h6">{proposal.proposalTitle}</Typography>
+              <Typography variant="body1">Submitted By: {proposal.applicantName}</Typography>
+              <Typography variant="body2">Summary: {proposal.summary}</Typography>
+          </Box>
           <IconButton
             className="resume-icon"
             href={proposal.resumeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()} // Prevent expanding when clicking the icon
+            onClick={(e) => e.stopPropagation()}
           >
             <NoteIcon />
           </IconButton>
         </CardContent>
 
-        {/* Show expanded content if expanded */}
-        {expanded && (
+        {isExpanded && (
           <CardContent className="proposal-card-body">
-            <Typography variant="h6">{proposal.proposalTitle}</Typography>
-            <Typography variant="body1">Submitted By: {proposal.applicantName}</Typography>
-            <Typography variant="body2">Summary: {proposal.summary}</Typography>
             <Typography variant="body2">Experience: {proposal.experience}</Typography>
 
-            {/* Accept/Reject Buttons */}
             <div className="proposal-action-buttons">
-            {proposal.applicationStatus === 'In Review' ? (
-                  <>
-                    <Button variant="contained" color="primary" onClick={handleAccept}>
-                      Accept
-                    </Button>
-                    <Button variant="contained" color="secondary" onClick={handleReject}>
-                      Reject
-                    </Button>
-                  </>
-                        ) : proposal.applicationStatus === 'Accepted' ? (
-                          <span style={{ color: 'green' }}>Proposal Accepted</span>
-                        ) : (
-                          <span style={{ color: 'red' }}>Proposal Rejected</span>
-                        )}
+              {proposal.applicationStatus === 'In Review' ? (
+                <>
+                  <Button variant="contained" color="primary" onClick={handleAccept}>
+                    Accept
+                  </Button>
+                  <Button variant="contained" color="secondary" onClick={handleReject}>
+                    Reject
+                  </Button>
+                </>
+              ) : proposal.applicationStatus === 'Accepted' ? (
+                <span style={{ color: 'green' }}>Proposal Accepted</span>
+              ) : (
+                <span style={{ color: 'red' }}>Proposal Rejected</span>
+              )}
             </div>
           </CardContent>
         )}
       </Card>
 
-      {/* Dialog for Accept/Reject Confirmation */}
       <Dialog open={openDialog} onClose={closeDialog}>
         <DialogTitle>
           {actionType === 'accept' ? 'Confirm Proposal Acceptance' : 'Confirm Proposal Rejection'}
@@ -247,6 +242,7 @@ const ProposalCard = ({ proposal, proposals, fetchProposals }) => {
           </Button>
         </DialogActions>
       </Dialog>
+    
     </>
   );
 };

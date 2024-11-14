@@ -7,25 +7,58 @@
 
 .left-pane {
   flex: 0 0 64%; /* Takes 64% of the width */
-  height: 100vh; /* Full height */
-  padding: 2%; /* Responsive padding */
-  margin-left: 2%; /* Left margin for spacing */
+  height: 100vh;
+  padding: 2%;
+  margin-left: 2%;
   margin-right: 2%;
-  background-color: #ffffff; /* Orange color */
+  background-color: #ffffff;
   box-sizing: border-box;
-  overflow-y: auto; /* Allow scrolling */
-  padding: 0;
+  overflow-y: auto;
+}
+
+.proposal-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.proposal-card {
+  width: 100%; /* Take full width of the container */
+  margin-bottom: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 15px;
+  background-color: #f8f8f8;
+}
+
+.proposal-card-content {
+  width: 100%;
 }
 
 .right-pane {
   flex: 0 0 30%; /* Takes 30% of the width */
   height: 100vh; /* Full height */
   padding: 2%; /* Responsive padding */
-  margin-right: 2%; /* Right margin for spacing */
-  background-color: #d6d3c4; /* Blue color */
+  margin-right: 2%;
+  background-color: #d6d3c4;
   box-sizing: border-box;
-  overflow-y: auto; /* Enable vertical scrolling */
-  
+  overflow-y: hidden; /* Disable scroll on the main right-pane */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.right-pane-content {
+  overflow-y: auto; /* Set scroll on the content area */
+  flex-grow: 1; /* Allow it to grow and take available space */
+}
+
+.pagination-container {
+  padding: 10px 0;
+  background-color: #d6d3c4;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
 }
 
 .content-container {
@@ -40,13 +73,6 @@
   width: 100%;
 }
 
-.proposal-list-container {
-  margin-top: 20px;
-  flex: 1;
-  overflow-y: auto;
-  min-height: 200px;
-  border: 1px solid red; /* Debug border */
-}
 
 /* Header Area styling */
 .header-area {
@@ -63,12 +89,17 @@
 @media (max-width: 1024px) {
   .container {
     flex-direction: column; /* Stack the panes vertically */
+    height: auto; /* Allow the container to grow with content */
   }
   .left-pane,
   .right-pane {
     flex: 0 0 100%; /* Full width for both panes */
     margin-left: 0; /* Remove left margin */
     margin-right: 0; /* Remove right margin */
+    height: auto; /* Allow flexible height for stacking */
+  }
+  .pagination-container {
+    padding: 10px;
   }
 }
 
@@ -83,5 +114,10 @@
   .header-area {
     font-size: 4vw; /* Further adjust font size for small screens */
     line-height: 60px; /* Adjust line height */
+  }
+  .pagination-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 5px; /* Adjust padding for smaller screens */
   }
 }

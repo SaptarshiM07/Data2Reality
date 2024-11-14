@@ -8,6 +8,7 @@ import { AuthRoute } from './components/PrivateRoute';
 import { ProfileCard } from './components/Profile_Page/ProfileCard';
 import { ProjectRequestForm } from './components/ProjectRequestForm';
 import { MainProjectComponent } from './components/ProjectComponent/MainProjectComponent';
+import EmailVerification from './components/EmailVerification';
 
 function App() {
   return (
@@ -23,7 +24,9 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Login />} /> {/* Default to Login */}
+        <Route path="/login" element={<Login />} /> {/* Default to Login */}
         <Route path="/register" element={<RegistrationForm />} />
+        <Route path="/verifyEmail" element={<EmailVerification />} />
         <Route element={<AuthRoute />}>
           {/* Nested protected routes under AuthRoute */}
           <Route path="/dashboard" element={<Dashboard />} />

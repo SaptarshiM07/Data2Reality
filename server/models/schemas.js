@@ -111,3 +111,35 @@ export const ProposalsTableSchema = {
     WriteCapacityUnits: 5
   }
 };
+
+//pending users schema
+export const PendingUsersTableSchema = {
+  TableName: 'PendingUsers',
+  KeySchema: [
+    { AttributeName: 'Email', KeyType: 'HASH' }  // Partition key (HASH)
+  ],
+  AttributeDefinitions: [
+    { AttributeName: 'Email', AttributeType: 'S' },  // Email as string (S)
+    { AttributeName: 'TokenExpires', AttributeType: 'N' },  // TokenExpires as a number (N)
+  ],
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5,
+    WriteCapacityUnits: 5
+  },
+  GlobalSecondaryIndexes: [
+    {
+      IndexName: 'TokenExpiresIndex',
+      KeySchema: [
+        { AttributeName: 'TokenExpires', KeyType: 'HASH' },  // Partition key (HASH)
+      ],
+      Projection: {
+        ProjectionType: 'ALL',  // Include all attributes
+      },
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+      }
+    }
+  ]
+};
+

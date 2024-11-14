@@ -43,9 +43,8 @@ export const uploadUpdate = (Status) => async (req, res) => {
                     unmetRequirements,
                     proposalSummary,
                     anticipatedOutcomes,
-                    resumeUpload,
-                    supplementalUpload,
                     applicationStatus,
+
                 } = req.body;
 
                 const UserType = req.headers['usertype'];
@@ -55,6 +54,8 @@ export const uploadUpdate = (Status) => async (req, res) => {
                 const proposalvideofileUrl = req.proposalvideofileUrl || 'No proposal video file uploaded';
                 const resumefileUrl = req.resumefileUrl || 'No resume file uploaded';
                 const supplementalfileUrl = req.supplementalfileUrl || 'No supplemental file uploaded';
+
+                console.log(proposalvideofileUrl);
 
                 // Generate or use existing projectID and proposalID
                 const newProjectID = projectID || uuidv4();
@@ -89,7 +90,8 @@ export const uploadUpdate = (Status) => async (req, res) => {
                         fundingDetails,
                         alternateContact,
                         specialInstructions,
-                        proposalVideoUrl: proposalvideofileUrl,
+                        proposalVideo: proposalvideofileUrl,
+                        supplementalUpload: supplementalfileUrl,
                         projectStatus: Status
                     };
 

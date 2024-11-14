@@ -15,6 +15,7 @@ import { Dialog,
          } from '@mui/material';
 //import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
+import { Delete as DeleteIcon } from '@mui/icons-material';
 
 
 
@@ -25,7 +26,11 @@ handleDialogClose,
 formData, 
 handleChange, 
 handleSave, 
-handleSubmit
+handleSubmit, 
+handleFileChange,
+handleDeleteFile,
+videoInputRef,
+documentInputRef,
 }) => {
 
 return (
@@ -350,6 +355,7 @@ return (
                             helperText="Provide anticipated salary and funding details (100 word limit)."
                         />
                         )}
+                        
                     
                         <StyledTextField
                         label="Alternate Contact Information"
@@ -375,97 +381,122 @@ return (
                         helperText="Provide any additional instructions or details (100 word limit)."
                         />
 
-
-                        {/*
-                        
-                        <Box sx={{ marginTop: '20px' }}>
-                            <Typography 
-                            variant="h6"
-                            sx={{
+                        {/*Uploaded supplemental document (.pdf)*/}
+                        <Box sx={{ marginTop: '20px', alignItems: 'center' }}>
+                            <Typography
+                                variant="h6"
+                                sx={{
                                 fontWeight: 'bold',
                                 backgroundColor: '#550000',
                                 color: 'white',
                                 padding: '8px',
-                            }}>
-                            Upload Supplemental File (.pdf, .docx)
+                                flexShrink: 0,
+                                marginBottom: '10px'
+                                }}
+                            >
+                                Upload Supplemental File (.pdf)
                             </Typography>
-
-                            <input
-                            type="file"
-                            name="supplementalUpload"
-                            accept=".pdf, .docx"
-                            onChange={handleFileChange}
-                            />
-
                             
-                            {formData.supplementalUpload && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
-                                
-                                {typeof formData.supplementalUpload === "object" ? (
-                                <Typography>{formData.supplementalUpload.name}</Typography>
+                            {/* File Input and Label */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
+                                <input
+                                type="file"
+                                name="supplementalUpload"
+                                accept=".pdf"
+                                onChange={handleFileChange}
+                                ref={documentInputRef}
+                                style={{ display: 'none' }}
+                                id="supplementalUploadInput"
+                                />
+                                <label htmlFor="supplementalUploadInput">
+                                <Button variant="contained" component="span" sx={{backgroundColor: '#550000'}}>
+                                    Choose File
+                                </Button>
+                                </label>
+                            
+
+                            {/* Display File Name and Delete Icon */}
+                            {formData.supplementalUpload ? (
+                                    // If a file is chosen, show the file name and delete icon
+                                    <>
+                                    <Typography sx={{ marginRight: '4px', marginLeft: '8px'}}>
+                                        {formData.supplementalUpload.name}
+                                    </Typography>
+                                    <IconButton
+                                        onClick={() => handleDeleteFile('supplementalUpload')}
+                                        size="small"
+                                        sx={{ color: 'red' }}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    </>
                                 ) : (
-                                <Typography>{formData.supplementalUpload}</Typography> // If it's a URL
+                                    // If no file is chosen, show "No file chosen"
+                                    <Typography sx={{ color: 'gray' , marginLeft: '8px'}}>
+                                    No file chosen
+                                    </Typography>
                                 )}
-
-                                
-                                <IconButton onClick={handleSupplementalFileRemove} sx={{ marginLeft: '8px' }}>
-                                <DeleteIcon />
-                                </IconButton>
                             </Box>
-                            )}
-
-                            
-                            {formData.supplementalUpload && typeof formData.supplementalUpload === "string" && (
-                            <Link href={formData.supplementalUpload} target="_blank" rel="noopener" sx={{ marginTop: '8px', display: 'block' }}>
-                                View Uploaded Supplemental File
-                            </Link>
-                            )}
                         </Box>
-
                         
-                        <Box sx={{ marginTop: '20px' }}>
-                            <Typography 
-                            variant="h6"
-                            sx={{
+
+                        {/*Proposal Video Upload*/}
+                        {/* <Box sx={{ marginTop: '20px', alignItems: 'center' }}>
+                            <Typography
+                                variant="h6"
+                                sx={{
                                 fontWeight: 'bold',
                                 backgroundColor: '#550000',
                                 color: 'white',
                                 padding: '8px',
-                            }}>
-                            Upload Proposal Video (.mp4)
-                            </Typography>
+                                flexShrink: 0,
+                                marginBottom: '10px'
+                                }}
+                            >
+                                Upload Proposal Video (.mp4)
+                            </Typography> */}
 
-                            <input
-                            type="file"
-                            name="proposalVideoUpload"
-                            accept="video/mp4"
-                            onChange={handleVideoChange}
-                            />
+                            {/* File Input and Label */}
+                            {/* <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
+                                <input
+                                type="file"
+                                name="proposalVideo"
+                                accept="video/mp4"
+                                onChange={handleFileChange}
+                                ref={videoInputRef}
+                                style={{ display: 'none' }}
+                                id="proposalVideoInput"
+                                />
+                                <label htmlFor="proposalVideoInput">
+                                <Button variant="contained" component="span" sx={{backgroundColor: '#550000'}}>
+                                    Choose File
+                                </Button>
+                                </label> */}
 
-                            
-                            {formData.proposalVideoUpload && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
-                                
-                                {typeof formData.proposalVideoUpload === "object" ? (
-                                <Typography>{formData.proposalVideoUpload.name}</Typography>
+                                {/* Display File Name and Delete Icon */}
+                                {/* {formData.proposalVideo ? (
+                                    // If a file is chosen, show the file name and delete icon
+                                    <>
+                                    <Typography sx={{ marginRight: '4px', marginLeft: '8px'}}>
+                                        {formData.proposalVideo.name}
+                                    </Typography>
+                                    <IconButton
+                                        onClick={() => handleDeleteFile('proposalVideo')}
+                                        size="small"
+                                        sx={{ color: 'red' }}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    </>
                                 ) : (
-                                <Typography>{formData.proposalVideoUpload}</Typography> // If it's a URL
+                                    // If no file is chosen, show "No file chosen"
+                                    <Typography sx={{ color: 'gray' , marginLeft: '8px'}}>
+                                    No file chosen
+                                    </Typography>
                                 )}
-
-                                
-                                <IconButton onClick={handleVideoRemove} sx={{ marginLeft: '8px' }}>
-                                <DeleteIcon />
-                                </IconButton>
                             </Box>
-                            )}
-
-                            
-                            {formData.proposalVideoUpload && typeof formData.proposalVideoUpload === "string" && (
-                            <Link href={formData.proposalVideoUpload} target="_blank" rel="noopener" sx={{ marginTop: '8px', display: 'block' }}>
-                                View Uploaded Proposal Video
-                            </Link>
-                            )}
                         </Box> */}
+
                     </>
                 </form>
             </DialogContent>

@@ -25,13 +25,14 @@ const Header = ({ userData, handleLogout, handleNewProjectClick, drawerOpen, tog
       display: 'flex', 
       alignItems: 'left', 
       justifyContent: 'space-between', 
-      padding: '10px 30px', 
+      padding: '5px 30px', 
       backgroundColor: 'white', 
       boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
       position: 'fixed',
       top: '0',
       width: '100%',
-      zIndex: 1000
+      zIndex: 1000,
+      gap: '20px'
     }}>
       
       <div>
@@ -44,7 +45,7 @@ const Header = ({ userData, handleLogout, handleNewProjectClick, drawerOpen, tog
           onClick={toggleDrawer(true)}  // Open the drawer when clicking the icon
           sx={{ padding: '0', backgroundColor: 'transparent' }}
         >
-          <img src={burger} alt="Menu" style={{ width: '36px', height: '36px' }} />
+          <img src={burger} alt="Menu" style={{ width: '36px', height: '36px' , marginTop: '5px'}} />
         </IconButton>
       </Box>
 
@@ -72,8 +73,11 @@ const Header = ({ userData, handleLogout, handleNewProjectClick, drawerOpen, tog
             alt="Data2Reality Logo" 
             style={{
             maxHeight: '100%',  // Ensure the image doesn't exceed the container's height
+            //maxHeight: '1200px',  // Increase this value to make the logo larger
+            maxWidth: '1000px',  // Set a max width if needed to maintain aspect ratio
             objectFit: 'contain',
-            cursor: 'pointer'  // Adds a pointer cursor on hover for better UX
+            cursor: 'pointer',  // Adds a pointer cursor on hover for better UX
+            marginTop: '10px'
             }} 
         />
         </Box>

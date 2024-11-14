@@ -100,7 +100,7 @@ export const MainProjectComponent = () => {
         toggleDrawer={toggleDrawer}
       />
 
-    <div className="container">
+    <div className="container" style={{ marginTop: '64px' }}>
 
     
   <div className="left-pane">
@@ -117,14 +117,14 @@ export const MainProjectComponent = () => {
 
       <div className="right-pane">
       <Box display="flex" flexDirection="column" height="100%" width="100%" boxSizing="border-box">
-    <ProjectList projects={projects} onSelect={setSelectedProjectID} />
-    <Box mt={2} width="100%" display="flex" justifyContent="center"> {/* Optional: adds margin-top */}
-      <Pagination
+    <ProjectList projects={projects} onSelect={setSelectedProjectID} userType= {UserType} />
+    <Box mt={2} width="100%" display="flex" justifyContent="center">
+       <Pagination
         projectsPerPage={projectsPerPage}
         totalProjects={totalProjects}
         paginate={paginate}
         currentPage={currentPage}
-      />
+      /> 
     </Box>
   </Box>
 </div>

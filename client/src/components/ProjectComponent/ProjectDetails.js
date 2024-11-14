@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import ReactPlayer from 'react-player';
 import {
   Box, 
@@ -71,6 +71,7 @@ const ProjectDetails = ({ project, userType, userInfo }) => {
     alternateContact: '',
     specialInstructions: '',
     proposalVideo: 'Proposal Video not Available',
+    supplementalUpload: 'No supplemental file uploaded',
     projectStatus: '',
     closeStatus: 'Open',
 
@@ -190,8 +191,10 @@ const ProjectDetails = ({ project, userType, userInfo }) => {
         alternateContact: project.alternateContact || '',
         specialInstructions: project.specialInstructions || '',
         proposalVideo: project.proposalVideo || '',
+        supplementalUpload: project.supplementalUpload || 'No supplemental file uploaded',
         projectStatus: project.projectStatus || '',
         closeStatus: project.closeStatus || '',
+
   
         // Student part of the form --> will not make sense for employer interface
         proposalID: proposal?.proposalID || '',
@@ -253,6 +256,7 @@ const ProjectDetails = ({ project, userType, userInfo }) => {
         alternateContact: project.alternateContact || '',
         specialInstructions: project.specialInstructions || '',
         proposalVideo: project.proposalVideo || '',
+        supplementalUpload: project.supplementalUpload || 'No supplemental file uploaded',
         projectStatus: project.projectStatus || '',
         closeStatus: project.closeStatus || '',
   
@@ -304,6 +308,9 @@ const ProjectDetails = ({ project, userType, userInfo }) => {
   const [notificationType, setNotificationType] = useState(''); // 'success' or 'error'
 
 
+  const documentInputRef = useRef(null);
+
+
   // behaviour when user goes from ine field to another 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -344,6 +351,20 @@ const ProjectDetails = ({ project, userType, userInfo }) => {
 
   const handleFileRemove = () => {
     setFormData({ ...formData, resumeUpload: proposals[0]?.resumeUpload || null});
+  };
+
+  const handleDeleteFile = () => {
+    setFormData({ ...formData, supplementalUpload: null });
+    setSupplementalFile(null);
+    documentInputRef.current.value = ''; // Clear file input
+  };
+
+  const getFileNameFromURL = (url) => {
+    if (url && url.startsWith('https://')) {
+      const urlParts = url.split('/');
+      return urlParts[urlParts.length - 1];
+    }
+    return null;
   };
 
 
@@ -1175,6 +1196,91 @@ const createFormPayload = (formData, videoFile, resumeFile, supplementalFile) =>
               helperText="Provide any additional instructions or details (100 word limit)."
             />
 
+
+            {/*Uploaded supplemental document (.pdf)*/}
+            <Box sx={{ marginTop: '20px', alignItems: 'center' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 'bold',
+                  backgroundColor: '#550000',
+                  color: 'white',
+                  padding: '8px',
+                  marginBottom: '10px',
+                }}
+              >
+                Upload Supplemental File (.pdf)
+              </Typography>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
+                <input
+                  type="file"
+                  name="supplementalUpload"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  ref={documentInputRef}
+                  style={{ display: 'none' }}
+                  id="supplementalUploadInput"
+                />
+                <label htmlFor="supplementalUploadInput">
+                  <Button variant="contained" component="span" sx={{ backgroundColor: '#550000' }}>
+                    Choose File
+                  </Button>
+                </label>
+
+                {project?.supplementalUpload && project.supplementalUpload.startsWith('https://') ? (
+                        <Link
+                            href={project.supplementalUpload}
+                            target="_blank"
+                            rel="noopener"
+                            sx={{ fontWeight: 'bold', marginLeft: '8px' }}
+                          >
+                            {getFileNameFromURL(project.supplementalUpload)}
+                        </Link>
+                
+                ):null
+                }
+
+                
+              </Box>
+
+              {supplementalFile ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+
+                        <Typography fontWeight={"bold"}>
+                            New File Chosen: {supplementalFile.name}
+                        </Typography>
+
+                        <IconButton onClick={handleDeleteFile} sx={{ marginLeft: '8px' }}>
+                            <DeleteIcon />
+                        </IconButton>
+
+                </Box>
+
+              ) : project?.supplementalUpload && project.supplementalUpload.startsWith('https://') ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+
+                        <Typography fontWeight={"bold"}>
+                          Current File: 
+                        </Typography>
+
+                        <Link
+                            href={project.supplementalUpload}
+                            target="_blank"
+                            rel="noopener"
+                            sx={{ fontWeight: 'bold', marginLeft: '8px' }}
+                          >
+                            {getFileNameFromURL(project.supplementalUpload)}
+                        </Link>
+
+                </Box>
+              ) : (
+                <Typography sx={{ fontWeight: 'bold', color: 'gray', marginLeft: '8px', marginTop: '8px' }}>
+                  No Supplemental file uploaded
+                </Typography>
+              )}
+
+            </Box>
 
             {/*
             

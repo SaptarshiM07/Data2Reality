@@ -5,6 +5,7 @@ import ProposalCard from './ProposalCard';
 export const ProposalList = ({ proposals, fetchProposals }) => {
   const itemsPerPage = 5;  // Define how many items to show per page
   const [currentPage, setCurrentPage] = useState(1);  // State for the current page
+  const [expandedProposalId, setExpandedProposalId] = useState(null);
 
   // Calculate the total number of pages
   const totalPages = Math.ceil(proposals.length / itemsPerPage);
@@ -14,6 +15,11 @@ export const ProposalList = ({ proposals, fetchProposals }) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
+  };
+
+  const handleToggleExpand = (proposalId) => {
+    // Toggle the expansion state, collapsing if already expanded
+    setExpandedProposalId((prevId) => (prevId === proposalId ? null : proposalId));
   };
 
   // Get the proposals for the current page
@@ -35,9 +41,15 @@ export const ProposalList = ({ proposals, fetchProposals }) => {
             borderBottom="1px solid #ccc" // Add a border between items
             paddingY={2} // Add some vertical padding for spacing
           >
-            <ProposalCard proposal={proposal} proposals={proposals} fetchProposals={fetchProposals} />
-          </Box>
-        ))
+            <ProposalCard
+          proposal={proposal}
+          proposals={proposals}
+          fetchProposals={fetchProposals}
+          isExpanded={expandedProposalId === proposal.proposalID} // Pass expanded state
+          onToggleExpand={() => handleToggleExpand(proposal.proposalID)} // Pass toggle function
+        />
+      </Box>
+    ))
       ) : (
         <Typography variant="body2">No proposals found.</Typography>
       )}

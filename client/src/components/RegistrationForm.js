@@ -1,4 +1,3 @@
-/*eslint-disable*/
 import React, { useState, useEffect } from 'react';
 import {
   TextField,
@@ -8,14 +7,21 @@ import {
   Typography,
   Container,
   RadioGroup,
-  Grid,
   Box,
   CircularProgress,
   Backdrop,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
-import { CountdownDialog } from './CountDownDialog';
+import { useNavigate } from 'react-router-dom';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import logo from '../img/logodtr.png';
+import { styled } from '@mui/material/styles';
 
+const endpointpath = process.env.REACT_APP_API_BASE_URL;
 
 export const RegistrationForm = () => {
   const [userType, setUserType] = useState('Student');
@@ -25,7 +31,7 @@ export const RegistrationForm = () => {
     MiddleInitials: '',
     LastName: '',
     Email: '',
-    Password: '', 
+    Password: '',
     Confirm_Password: ''
   });
   const [formErrors, setFormErrors] = useState({});
@@ -33,20 +39,13 @@ export const RegistrationForm = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [capsLockOn, setCapsLockOn] = useState(false);
+  const [capsLockOnConfirm, setCapsLockOnConfirm] = useState(false);
+  const navigate = useNavigate();
 
-  const handleUserTypeChange = (e) => {
-    setUserType(e.target.value);
-    setFormData({
-      UIN: '',
-      FirstName: '',
-      MiddleInitials: '',
-      LastName: '',
-      Email: '',
-      Password: '',
-      Confirm_Password: ''
-    });
-    setTouchedFields({});
-  };
+  const handleUserTypeChange = (e) => setUserType(e.target.value);
 
   // Validation functions
   const validateUIN = (value) => /^\d{9}$/.test(value);
@@ -65,7 +64,7 @@ export const RegistrationForm = () => {
         if (!validateUIN(value)) errorMessage = 'UIN must be a 9-digit number';
         break;
       case 'Password':
-        if (!validatePassword(value)) errorMessage = 'Password must be 8-20 characters long, with at least one uppercase letter, one lowercase letter, one numeral, and one special character';
+        if (!validatePassword(value)) errorMessage = 'Password must be 8-20 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character (!, @, #, $, %, ^, &, *)';
         break;
       case 'Confirm_Password':
         if (value !== formData.Password) errorMessage = "Passwords don't match";
@@ -80,13 +79,12 @@ export const RegistrationForm = () => {
         if (value && !validateInitials(value)) errorMessage = 'Middle initials must be in uppercase (Ex: A)';
         break;
       case 'Email':
-        if (!validateEmail(value)) errorMessage = 'Email must be a valid tamu.edu address (Ex: hello@tamu.edu';
+        if (!validateEmail(value)) errorMessage = 'Email must be a valid tamu.edu address (Ex: hello@tamu.edu)';
         break;
       default:
         break;
     }
 
-    console.log('Field:', fieldName, 'Value:', value, 'Error:', errorMessage);
     setFormErrors((prevErrors) => ({
       ...prevErrors,
       [fieldName]: errorMessage,
@@ -114,11 +112,10 @@ export const RegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    setIsLoading(true); // Show loading screen
     try {
-      const endpointpath = process.env.REACT_APP_API_BASE_URL;
-      const response = await fetch(`${endpointpath}/api/sendVerificationEmail`, {
+      const response = await fetch(`${endpointpath}/api/sendEmailVerification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,37 +127,39 @@ export const RegistrationForm = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        console.log(data.message); // Assume success message is returned
-        setIsLoading(false); // Hide loading screen
-        alert("Verification email sent. Please check your email to verify.");
+        setOpenDialog(true);
+        setTimeout(() => {
+          setOpenDialog(false);
+          navigate('/');
+        }, 3000);
       } else {
         const errorData = await response.json();
-        console.error('Failed to send verification email: ', errorData);
         alert('Failed to send verification email: ' + errorData.error);
       }
     } catch (error) {
-      console.error('There was an error sending the verification email!', error);
-      alert('There was an error!');
+      alert('There was an error sending the verification email!');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false); // Hide loading screen
   };
 
   const checkFormValidity = () => {
     const fields = Object.keys(formData);
-    for (let i = 0; i < fields.length; i++) {
-      const fieldName = fields[i];
-      if (!validateField(fieldName, formData[fieldName])) {
-        return false;
-      }
-    }
-    return true;
+    return fields.every((field) => validateField(field, formData[field]));
   };
 
   useEffect(() => {
-    console.log('formData:', formData);
     setIsFormValid(checkFormValidity());
   }, [formData]);
+
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleClickShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+
+  const handleCapsLockKey = (e, setCapsLock) => {
+    if (e.getModifierState) {
+      setCapsLock(e.getModifierState('CapsLock'));
+    }
+  };
 
   return (
     <Box
@@ -173,230 +172,290 @@ export const RegistrationForm = () => {
       }}
     >
       {/* Top Banner with Logo */}
-{/* Top Banner with Logo */}
-<Box
-  sx={{
-    width: '100%',
-    backgroundColor: 'white',
-    boxShadow: 1,
-    display: 'flex',
-    alignItems: 'center', // Vertically centers the content
-    height: '60px', // Fixed height for the banner
-  }}
->
-  <img
-    src={logo}
-    alt="TAMU Logo"
-    style={{
-      width: '300px', // Desired width
-      maxHeight: '50px', // Restrict the max height to avoid overflowing
-      objectFit:'contain',
-      marginLeft: '0.2%', // Keeps a 2% gap from the left edge
-      marginTop:'1%'
-    }}
-  />
-</Box>
-
-      {/* Login Form Container */}
       <Box
         sx={{
-          flex: 1,
+          width: '100%',
+          backgroundColor: 'white',
+          boxShadow: 1,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-          paddingY: 4,
+          height: '60px',
         }}
       >
-        {/* Loading overlay */}
+        <img
+          src={logo}
+          alt="TAMU Logo"
+          style={{
+            width: '300px',
+            maxHeight: '50px',
+            objectFit: 'contain',
+            marginLeft: '0.2%',
+            marginTop: '1%',
+          }}
+        />
+      </Box>
+
+      {/* Loading overlay */}
       <Backdrop open={isLoading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <CircularProgress color="inherit" />
       </Backdrop>
 
-    <Container
-    maxWidth="xs" // Increase the maxWidth from 'xs' to 'md' for a wider container
-    sx={{
-      textAlign: 'center',
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-      backgroundColor: '#fff',
-      padding: '16px',
-      marginTop: '32px',
-    }}
-    >
-        <Typography variant="h4" gutterBottom>
+      {/* Registration Form */}
+      <Container
+        maxWidth={false} // Disable the default maxWidth
+        sx={{
+          textAlign: 'center',
+          border: '5px solid #550000',
+          borderRadius: '8px',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+          backgroundColor: '#D1D1D1',
+          padding: '16px',
+          marginTop: '32px',
+          marginBottom: '32px',
+          maxWidth: '600px'
+          
+        }}
+      >
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#550000' }}>
           Registration Form
         </Typography>
 
         <form onSubmit={handleSubmit}>
-      
-            <Typography variant="h6" gutterBottom>
-              User Status: 
-            </Typography>
-  
-            <RadioGroup
-              aria-label="userType"
-              name="userType"
-              value={userType}
-              onChange={handleUserTypeChange}
-              row
-            >
+          <Typography variant="h6" gutterBottom sx={sectionHeaderStyle}>
+            User Status:
+          </Typography>
+
+          <RadioGroup
+            aria-label="userType"
+            name="userType"
+            value={userType}
+            onChange={handleUserTypeChange}
+            row
+          >
             <FormControlLabel value="Student" control={<Radio />} label="Student" />
             <FormControlLabel value="Employer" control={<Radio />} label="Employer" />
-            </RadioGroup>
+          </RadioGroup>
 
-            <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom sx={sectionHeaderStyle}>
             User Information:
-            </Typography>
+          </Typography>
 
+          <StyledTextField
+            label="UIN"
+            name="UIN"
+            value={formData.UIN}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!formErrors.UIN}
+            helperText={touchedFields.UIN ? formErrors.UIN : ''}
+          />
 
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="UIN"
-              label="UIN"
-              name="UIN"
-              value={formData.UIN}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={!!formErrors.UIN}
-              helperText={touchedFields.UIN ? formErrors.UIN : ''}
-              sx={{ marginBottom: '16px' }}
-            />
+          <StyledTextField
+            label="First Name"
+            name="FirstName"
+            value={formData.FirstName}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!formErrors.FirstName}
+            helperText={touchedFields.FirstName ? formErrors.FirstName : ''}
+          />
 
-            <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="LastName"
-                label="Last Name"
-                name="LastName"
-                value={formData.LastName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={!!formErrors.LastName}
-                helperText={touchedFields.LastName ? formErrors.LastName : ''}
-              /> 
-        
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="FirstName"
-              label="First Name"
-              name="FirstName"
-              value={formData.FirstName}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={!!formErrors.FirstName}
-              helperText={touchedFields.FirstName ? formErrors.FirstName : ''}
-            />
+          <StyledTextField
+            label="Last Name"
+            name="LastName"
+            value={formData.LastName}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!formErrors.LastName}
+            helperText={touchedFields.LastName ? formErrors.LastName : ''}
+          />
+
           
-            <TextField
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="MiddleInitials"
-              label="Middle Initials (Optional)"
-              name="MiddleInitials"
-              value={formData.MiddleInitials}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={!!formErrors.MiddleInitials}
-              helperText={touchedFields.MiddleInitials ? formErrors.MiddleInitials : ''}
-            />
-    
 
-            <Typography variant="h6" gutterBottom>
-              Login Credentials:
-            </Typography>
+          <StyledTextField
+            label="Middle Initials (Optional)"
+            name="MiddleInitials"
+            value={formData.MiddleInitials}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!formErrors.MiddleInitials}
+            helperText={touchedFields.MiddleInitials ? formErrors.MiddleInitials : ''}
+          />
 
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="Email"
-              label="Email Address"
-              name="Email"
-              type="email"
-              value={formData.Email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={!!formErrors.Email}
-              helperText={touchedFields.Email ? formErrors.Email : ''}
-              sx={{ marginBottom: '16px' }}
-              />
+          <Typography variant="h6" gutterBottom sx={sectionHeaderStyle}>
+            Login Credentials:
+          </Typography>
 
-            <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="Password"
+          <StyledTextField
+            label="Email Address"
+            name="Email"
+            type="email"
+            value={formData.Email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={!!formErrors.Email}
+            helperText={touchedFields.Email ? formErrors.Email : ''}
+          />
+
+          <StyledTextField
             label="Password"
             name="Password"
+            type={showPassword ? 'text' : 'password'}
             value={formData.Password}
             onChange={handleChange}
             onBlur={handleBlur}
             error={!!formErrors.Password}
-            helperText={touchedFields.Password ? formErrors.Password : ''}
-            sx={{ marginBottom: '16px' }}
-            />
+            helperText={
+              <div>
+                {touchedFields.Password && formErrors.Password && (
+                <Typography component="div" variant="body2" color="error" display="block">
+                  Password must:
+                  <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                    <li>Be 8-20 characters long</li>
+                    <li>Include at least one uppercase letter</li>
+                    <li>Include at least one lowercase letter</li>
+                    <li>Include at least one number</li>
+                    <li>Include at least one special character (!, @, #, $, %, ^, &, *)</li>
+                  </ul>
+                </Typography>
+                )}
+                 {capsLockOn && (
+                  <Typography component="div" sx={{ color: '#550000', fontSize: '0.875rem', marginTop: '4px' }}>
+                    Caps Lock is on
+                  </Typography>
+                )}
+              </div>
+            }
+            onKeyDown={(e) => handleCapsLockKey(e, setCapsLockOn)}
+            onKeyUp={(e) => handleCapsLockKey(e, setCapsLockOn)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleClickShowPassword}
+                    edge="end"
+                  >
+                    {showPassword ?  <Visibility />: <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
 
-            <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="Confirm Password"
+          <StyledTextField
             label="Confirm Password"
             name="Confirm_Password"
+            type={showConfirmPassword ? 'text' : 'password'}
             value={formData.Confirm_Password}
             onChange={handleChange}
             onBlur={handleBlur}
             error={!!formErrors.Confirm_Password}
-            helperText={touchedFields.Confirm_Password ? formErrors.Confirm_Password : ''}
-            sx={{ marginBottom: '16px' }}
-            />
+            helperText={
+              touchedFields.Confirm_Password && formErrors.Confirm_Password && (
+                <Typography component="span" color="error" display="block">
+                  {formErrors.Confirm_Password}
+                </Typography>
+              )
+            }
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleClickShowConfirmPassword}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
-                <Button
-                  type="button"
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => setFormData({
-                    UIN: '',
-                    FirstName: '',
-                    MiddleInitials: '',
-                    LastName: '',
-                    Email: '',
-                    Password: '',
-                    Confirm_Password: ''
-                  })}
-                >
-                  Reset Form
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  disabled={!isFormValid}
-                >
-                  Register
-                </Button>
+            <Button
+              type="button"
+              variant="contained"
+              sx={buttonStyles.cancel}
+              onClick={() =>
+                setFormData({
+                  UIN: '',
+                  FirstName: '',
+                  MiddleInitials: '',
+                  LastName: '',
+                  Email: '',
+                  Password: '',
+                  Confirm_Password: ''
+                })
+              }
+            >
+              Reset Form
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={buttonStyles.publish}
+              disabled={!isFormValid}
+            >
+              Register
+            </Button>
           </Box>
         </form>
-  {/* CountdownDialog component */}
-  <CountdownDialog open={openDialog} setOpen={setOpenDialog} />
-</Container>
-</Box>
-</Box>
+      </Container>
 
-);
+      {/* Dialog for showing email verification prompt */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Email Verification</DialogTitle>
+        <DialogContent>
+          <Typography>Please check your email ({formData.Email}) for the verification link to activate your account.</Typography>
+        </DialogContent>
+      </Dialog>
+    </Box>
+  );
 };
+
+
+// Define custom styles for the buttons and headers
+const buttonStyles = {
+  cancel: {
+    border: '3px solid #550000',
+    backgroundColor: '#f5f5f5',
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  publish: {
+    border: '3px solid #550000',
+    backgroundColor: '#4caf50',
+    color: '#000',
+    fontWeight: 'bold',
+  },
+};
+
+const sectionHeaderStyle = {
+  fontWeight: 'bold',
+  backgroundColor: '#550000',
+  color: 'white',
+  padding: '8px',
+};
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  margin: '16px 0',
+  width: '100%', // Ensures the width remains consistent
+  '& .MuiInputBase-root': {
+    fontSize: '1rem', // Set a fixed font size
+    padding: '10px 14px', // Set a fixed padding
+  },
+  '& .MuiInputBase-input': {
+    color: theme.palette.text.primary,
+  },
+  '& .MuiInputBase-input::placeholder': {
+    color: 'grey',
+    fontStyle: 'italic',
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderWidth: '1px', // Set a consistent border width
+  },
+  '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderWidth: '1px', // Prevents the border from changing thickness on focus
+  },
+}));
+

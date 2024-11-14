@@ -1,5 +1,7 @@
 import { documentClient } from '../awsConfig.js';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import { sendEmailVerification } from './sendEmailVerification.js';
 
 // Function to check if a record with UIN or Email already exists
 const checkIfExists = async (tableName, key, value) => {
