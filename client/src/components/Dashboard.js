@@ -146,6 +146,21 @@ export const Dashboard = () => {
                   </CardContent>
                 </Card>
               </Grid>
+
+
+              <Grid item>
+                <Card sx={{ textAlign: 'center', p: 1, backgroundColor: '#f3e5f5', minHeight: '120px' }}>
+                  <CardContent>
+                    <Avatar sx={{ bgcolor: '#8e24aa', m: '0 auto', mb: 1 }}>
+                      <CheckCircle />
+                    </Avatar>
+                    <Typography variant="h6">{stats.closedProjects}</Typography>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Projects Closed
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
           </Grid>
 
@@ -166,19 +181,7 @@ export const Dashboard = () => {
                 </Card>
               </Grid>
 
-              <Grid item>
-                <Card sx={{ textAlign: 'center', p: 1, backgroundColor: '#f3e5f5', minHeight: '120px' }}>
-                  <CardContent>
-                    <Avatar sx={{ bgcolor: '#8e24aa', m: '0 auto', mb: 1 }}>
-                      <CheckCircle />
-                    </Avatar>
-                    <Typography variant="h6">{stats.closedProjects}</Typography>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      Projects Closed
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+              
             </Grid>
           </Grid>
         </Grid>

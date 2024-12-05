@@ -78,6 +78,7 @@ router.post('/user/addrole', authenticateToken, (req, res) => {
 const saveHandler = uploadUpdate('Saved');
 const submitHandler = uploadUpdate('Submitted');
 const withdrawHandler = uploadUpdate('Withdrawn');
+const closeHandler = uploadUpdate('Closed');
 
 // Set up routes using the setupRoute function
 setupRoute(router, '/save', saveHandler);
@@ -107,6 +108,12 @@ router.get('/projects', authenticateToken, (req,res) => {
 router.post('/withdraw', authenticateToken, (req, res) => {
   console.log('POST /api/withdraw');
   withdrawHandler(req, res);
+} 
+);
+
+router.post('/close', authenticateToken, (req, res) => {
+  console.log('POST /api/close');
+  closeHandler(req, res);
 } 
 );
 

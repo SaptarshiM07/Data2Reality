@@ -146,7 +146,7 @@ export const uploadUpdate = (Status) => async (req, res) => {
 
     }
 
-    else if (req.path === '/withdraw') {
+    else if (req.path === '/withdraw' || req.path === '/close') {
                 console.log("I am here");
                 const { projectID, userType, UIN } = req.body;
                 let queryParams = {};

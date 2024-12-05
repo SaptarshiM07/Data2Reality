@@ -1,30 +1,39 @@
-import nodemailer from 'nodemailer';
+import { ses } from './awsConfig.js';
 
-// Create a Nodemailer transporter using SendGrid
-const transporter = nodemailer.createTransport({
-  host: 'smtp.sendgrid.net',
-  port: 587,
-  auth: {
-    user: 'apikey',  // This is the username for SendGrid (fixed as 'apikey')
-    pass: process.env.SENDGRID_API_KEY,  // Your SendGrid API Key
-  },
-});
+/**
+ * Send an email using AWS SES.
+ * @param {string} toEmail - Recipient email address.
+ * @param {string} subject - Email subject.
+ * @param {string} bodyHtml - HTML body content.
+ */
+const sendEmail = async (toEmail, subject, bodyHtml) => {
+    const params = {
+        Source: 'your_verified_email@verifieddomain.com', // Use your verified email
+        Destination: {
+            ToAddresses: [toEmail],
+        },
+        Message: {
+            Subject: {
+                Data: subject,
+                Charset: 'UTF-8',
+            },
+            Body: {
+                Html: {
+                    Data: bodyHtml,
+                    Charset: 'UTF-8',
+                },
+            },
+        },
+    };
 
-// Send email using the SendGrid transporter
-const sendEmail = async (to, subject, text) => {
-  const mailOptions = {
-    from: 'saptarshi031998@gmail.com',  // Sender email
-    to,  // Recipient email
-    subject,
-    text,
-  };
-
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: ' + info.response);
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
+    try {
+        const result = await ses.sendEmail(params).promise();
+        console.log('Email sent successfully:', result);
+        return result;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        throw error;
+    }
 };
 
 export default sendEmail;

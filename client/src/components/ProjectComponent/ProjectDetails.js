@@ -307,6 +307,9 @@ const ProjectDetails = ({ project, userType, userInfo }) => {
   const [notification, setNotification] = useState('');
   const [notificationType, setNotificationType] = useState(''); // 'success' or 'error'
 
+  const [dialogOpen, setDialogOpen] = useState(false); // State for dialog visibility
+  const [dialogAction, setDialogAction] = useState(null); // State for the action type ('cancel' or 'close')
+
 
   const documentInputRef = useRef(null);
 
@@ -394,7 +397,26 @@ const createFormPayload = (formData, videoFile, resumeFile, supplementalFile) =>
   return formPayload;
 };
 
+// Open confirmation dialog
+const openDialog = (action) => {
+  setDialogAction(action); // Set action type (e.g., 'cancel' or 'close')
+  setDialogOpen(true); // Open dialog
+};
 
+// Close confirmation dialog
+const closeDialog = () => {
+  setDialogOpen(false); // Close dialog
+};
+
+// Handle confirmation action
+const handleDialogConfirm = () => {
+  if (dialogAction === 'cancel') {
+    handleWithdraw(null, project, userType, userInfo); // Call cancel handler
+  } else if (dialogAction === 'close') {
+    handleClose(null, project, userType, userInfo); // Call close handler
+  }
+  setDialogOpen(false); // Close dialog after action
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -491,11 +513,12 @@ const createFormPayload = (formData, videoFile, resumeFile, supplementalFile) =>
 
 
   // handle withdraw application function 
-
   const handleWithdraw = async (e, project, userType, userInfo) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault(); // Only prevent default if `e` exists
+    }
 
-    console.log('This is my project', project)
+    console.log(`You are about to cancel ${project}`)
   
     try {
       const response = await fetch(`${endpointpath}/api/withdraw`, {
@@ -514,7 +537,7 @@ const createFormPayload = (formData, videoFile, resumeFile, supplementalFile) =>
       if (response.ok) {
         console.log('Proposal withdrawn successfully');
         if (userType === 'Employer') {
-          setNotification('Project withdrawn successfully.');
+          setNotification('Project cancelled successfully.');
         } else {
           setNotification('Application withdrawn successfully.');
         }
@@ -528,18 +551,69 @@ const createFormPayload = (formData, videoFile, resumeFile, supplementalFile) =>
           window.location.reload();
         }, 1000);
       } else {
-        console.error('Failed to withdraw proposal');
-        setNotification('Failed to withdraw proposal.');
+        console.error('Failed to withdraw/cancel');
+        setNotification('Failed to withdraw/cancel');
         setNotificationType('error');
       }
     } catch (error) {
-      console.error('Error withdrawing proposal:', error);
+      console.error('Error withdrawing/cancelling:', error);
     } finally {
       handleDrawerClose(); // Close the dialog box regardless of the outcome
     }
   };
-  console.log("This are me proposal items", proposals);
+
+ // handle Close project function 
+
+  const handleClose = async (e, project, userType, userInfo) => {
+    if (e) {
+      e.preventDefault(); // Only prevent default if `e` exists
+    }
+
+    console.log(`You are about to close ${project}`)
+
+    try {
+      const response = await fetch(`${endpointpath}/api/close`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': localStorage.getItem('token'), // Include the token from localStorage
+        },
+        body: JSON.stringify({
+          projectID: project.projectID, 
+          userType: userType,   
+          UIN: userInfo.UIN              
+        }),
+      });
+
+      if (response.ok) {
+        setNotification('Project closed successfully.');
+        setNotificationType('success');
+        
+        // Scroll to the top of the page
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Reload the page after 2 seconds
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        console.error('Failed to close project');
+        setNotification('Failed to close project.');
+        setNotificationType('error');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      handleDrawerClose(); // Close the dialog box regardless of the outcome
+    }
+  };
+
+ 
+  
+
+  // console.log("This are me proposal items", proposals);
   return (
+    <>
     <Box display="flex" flexDirection="column" height="100vh" alignItems="flex-start" justifyContent="flex-start">
             <Box
               display={notification ? 'block' : 'none'}
@@ -1385,16 +1459,22 @@ const createFormPayload = (formData, videoFile, resumeFile, supplementalFile) =>
               display="flex"
               flexDirection="column"
               alignItems="center"
-              width="100px"
+              width="auto"
             >
+              {userType === 'Employer' && status === 'Submitted' && (
               <Button
-                onClick={handleDrawerClose}
-                sx={buttonStyles.cancel}
-                variant="contained"
-              >
-                Cancel
-              </Button>
+                  // onClick={(e) => handleWithdraw(e, project, userType, userInfo)}
+                  onClick={() => openDialog('cancel')}
+                  sx={buttonStyles.cancelProject}
+                  variant="contained"
+                  disabled={!project || !project.projectID}
+                >
+                  Cancel Project
+                </Button>
+
+              )}
             </Box>
+
             <Box
               display="flex"
               flexDirection="column"
@@ -1427,24 +1507,50 @@ const createFormPayload = (formData, videoFile, resumeFile, supplementalFile) =>
                 </Button>
               ) : null}
             </Box>
+
             <Box>
               {status === 'Submitted' && (
                 <Button
-                  onClick={(e) => handleWithdraw(e, project, userType, userInfo)}
+                  // onClick={(e) => handleClose(e, project, userType, userInfo)}
+                  onClick={() => openDialog('close')}
                   sx={buttonStyles.close}
                   variant="contained"
                   disabled={!project || !project.projectID}
                 >
-                  {userType === 'Student' ? 'Withdraw Application' : 'Close Request'}
+                  {userType === 'Student' ? 'Withdraw Application' : 'Close Project'}
                 </Button>
               )}
             </Box>
+
+
           </Box>
         </Box>
         </Drawer>
     </>
 
     </Box>
+
+    <Dialog open={dialogOpen} onClose={closeDialog}>
+    <DialogTitle sx={{ color: '#d32f2f' }}>Warning</DialogTitle>
+    <DialogContent>
+      <Typography>
+        You are about to {dialogAction === 'cancel' ? 'cancel this project' : 'close this project'}. Please confirm your action.
+      </Typography>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={closeDialog} sx={{ color: '#555' }}>
+        Cancel
+      </Button>
+      <Button
+        onClick={handleDialogConfirm}
+        sx={{ color: '#fff', backgroundColor: '#d32f2f', '&:hover': { backgroundColor: '#b71c1c' } }}
+      >
+        Confirm
+      </Button>
+    </DialogActions>
+    </Dialog>
+
+</>
   );
 };
 
@@ -1453,10 +1559,10 @@ export default ProjectDetails;
 
 // Define custom styles for the buttons
 const buttonStyles = {
-  cancel: {
-    border: '3px solid #550000',
-    backgroundColor: '#f5f5f5', // Light grey
-    color: '#000', // Black text
+  cancelProject: {
+    border: '3px solid #ff0000', // Red border
+    backgroundColor: '#ff4d4d', // Red background
+    color: '#fff', // White text
     fontWeight: 'bold',
   },
   save: {
@@ -1472,9 +1578,9 @@ const buttonStyles = {
     fontWeight: 'bold',
   },
   close: {
-    border: '3px solid #550000', // maroon border
-    backgroundColor: '#550000', // maroon background
-    color: '#fff', // Black text
+    border: '3px solid #550000', // Maroon border
+    backgroundColor: '#550000', // Maroon background
+    color: '#fff', // White text
     fontWeight: 'bold',
   },
 };

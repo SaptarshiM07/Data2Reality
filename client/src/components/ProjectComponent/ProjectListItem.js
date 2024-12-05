@@ -14,11 +14,13 @@ const ProjectListItem = ({ project, onSelect, userType}) => {
   const getStatusTag = (status) => {
     switch (status) {
       case 'Saved':
-        return { color: 'yellow', text: 'Saved', textColor: '#550000' };
+        return { color: '#DAA520', text: 'Saved', textColor: 'white' };
       case 'Submitted':
         return { color: 'green', text: 'Published', textColor: 'white' };
       case 'Withdrawn':
-        return { color: '#550000', text: 'Closed', textColor: 'white' };
+        return { color: '#B22222', text: 'Cancelled', textColor: 'white' };
+      case 'Closed':
+          return { color: '#550000', text: 'Closed', textColor: 'white' };
       default:
         return null;
     }

@@ -29,6 +29,7 @@ let dynamo;
 let documentClient;
 let s3;
 let sns;
+let ses;
 
 const initializeAWS = () => {
   configureAWS();
@@ -57,8 +58,16 @@ const initializeAWS = () => {
     console.error('Error creating SNS client:', error);
     process.exit(1);  // Exit the process with a failure code
   }
+
+  try {
+    ses = new AWS.SES();
+    console.log('SES client created successfully');
+  }catch (error) {
+    console.error('Error creating SES client', error);
+    process.exit(1);
+  }
 };
 
 //initializeAWS(); // no need to call it again.
 
-export { initializeAWS, dynamo, documentClient, s3, sns};
+export { initializeAWS, dynamo, documentClient, s3, sns, ses};
